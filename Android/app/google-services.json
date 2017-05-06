@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "862864402354",
+    "firebase_url": "https://braillo-a4f09.firebaseio.com",
+    "project_id": "braillo-a4f09",
+    "storage_bucket": "braillo-a4f09.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:862864402354:android:39ede52bd458c080",
+        "android_client_info": {
+          "package_name": "com.github.codeloop.braillo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "862864402354-dcmamfj91s6akme481cbndagfcin4oqf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.github.codeloop.braillo",
+            "certificate_hash": "a1efa994bed5850a579675c6d5c5da7a2f1a1b1f"
+          }
+        },
+        {
+          "client_id": "862864402354-h9h6u4lk7v14kcgrsjrmokc21ncrgle2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAAfMrKi1py2I1uaggYXMzL-4PyPoSlwwA"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "862864402354-h9h6u4lk7v14kcgrsjrmokc21ncrgle2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
