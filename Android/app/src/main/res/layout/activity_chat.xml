@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <FrameLayout
+        android:layout_weight="1"
+        android:layout_width="match_parent"
+        android:layout_height="0dp">
+
+    </FrameLayout>
+
+    <TableLayout
+        android:layout_weight="1"
+        android:layout_width="match_parent"
+        android:layout_height="0dp">
+
+        <TableRow
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_weight="1">
+
+            <android.support.v7.widget.AppCompatImageButton
+                android:id="@+id/one"
+                android:background="@null"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                tools:src="@drawable/circle"
+                android:padding="@dimen/paddings"
+                android:layout_height="match_parent"/>
+
+            <android.support.v7.widget.AppCompatImageButton
+                android:id="@+id/two"
+                android:background="@null"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                tools:src="@drawable/circle"
+                android:padding="@dimen/paddings"
+                android:layout_height="match_parent"/>
+        </TableRow>
+
+        <TableRow
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_weight="1">
+
+            <android.support.v7.widget.AppCompatImageButton
+                android:id="@+id/three"
+                android:background="@null"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                tools:src="@drawable/circle"
+                android:padding="@dimen/paddings"
+                android:layout_height="match_parent"/>
+
+            <android.support.v7.widget.AppCompatImageButton
+                android:id="@+id/four"
+                android:background="@null"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                tools:src="@drawable/circle"
+                android:padding="@dimen/paddings"
+                android:layout_height="match_parent"/>
+        </TableRow>
+
+        <TableRow
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_weight="1">
+
+            <android.support.v7.widget.AppCompatImageButton
+                android:id="@+id/five"
+                android:background="@null"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                tools:src="@drawable/circle"
+                android:padding="@dimen/paddings"
+                android:layout_height="match_parent"/>
+
+            <android.support.v7.widget.AppCompatImageButton
+                android:id="@+id/six"
+                android:background="@null"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                tools:src="@drawable/circle"
+                android:padding="@dimen/paddings"
+                android:layout_height="match_parent"/>
+        </TableRow>
+
+    </TableLayout>
+
+</LinearLayout>
