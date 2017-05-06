@@ -1,20 +1,22 @@
 package com.github.codeloop.braillo;
 
-import android.*;
 import android.Manifest;
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.view.MotionEvent;
+import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.github.codeloop.braillo.models.Chat;
 import com.google.firebase.database.ChildEventListener;
@@ -27,26 +29,41 @@ import net.glxn.qrgen.android.QRCode;
 
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnTouchListener{
 
+    int counter;
+    LinearLayout linearLayout;
+    Handler handler;
+    boolean isRunning;
+    DatabaseReference reference;
+    FirebaseDatabase firebaseDatabase;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        linearLayout=(LinearLayout)findViewById(R.id.linearLayout);
+        linearLayout.setOnTouchListener(this);
+        counter=0;
+        isRunning=false;
+        handler=new Handler();
+        checkPermissions();
+        firebaseDatabase=FirebaseDatabase.getInstance();
 
 
-//        checkPermissions();
 
-
-//        startScanner();
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode==20){
-            String phoneid=data.getStringExtra("phoneid");
-            Log.d("mytag",phoneid);
+            String phoneData = data.getStringExtra("phonedata");
+
+            //send firebase request from qrcoder reader user
+            String roomName = phoneData.split(",")[1];
+            reference=firebaseDatabase.getReference().child(roomName);
+            reference.push().setValue("Ok");
+            startActivity(new Intent(getApplicationContext(),ChatActivity.class));
         }
 
     }
@@ -59,8 +76,7 @@ public class MainActivity extends AppCompatActivity {
     private void checkPermissions(){
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE)
                 == PackageManager.PERMISSION_GRANTED) {
-            TelephonyManager tMgr =(TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
-            generateQR(tMgr.getDeviceId());
+
 
         } else
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE,
@@ -72,36 +88,30 @@ public class MainActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if(requestCode==10){
-            if(grantResults[0]==PackageManager.PERMISSION_GRANTED)
-
-            {TelephonyManager tMgr =(TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
-                generateQR(tMgr.getDeviceId());
+            if(grantResults[0]==PackageManager.PERMISSION_GRANTED) {
             }
         }
     }
 
-    private void generateQR(String id){
-        Bitmap myBitmap = QRCode.from(id).bitmap();
+    private void generateQR(String data){
+        String roomNameForQrGenerator = String.valueOf(System.currentTimeMillis());
+        Bitmap myBitmap = QRCode.from(data+","+roomNameForQrGenerator).bitmap();
         ImageView myImage = (ImageView) findViewById(R.id.img);
+        myImage.setVisibility(View.VISIBLE);
         myImage.setImageBitmap(myBitmap);
+
+        listenToClient(roomNameForQrGenerator);
     }
 
 
-    private void setupFirebase(){
-        FirebaseDatabase firebaseDatabase=FirebaseDatabase.getInstance();
-        DatabaseReference reference=firebaseDatabase.getReference().child("child");
-        reference
-                .push()
-                .setValue(new Chat("tesast1",
-                        "97",
-                        System.currentTimeMillis()));
-
-
+    private void listenToClient(String roomName){
+        reference=firebaseDatabase.getReference().child(roomName);
         reference.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                Log.d("mytag",s+" string "  +dataSnapshot.toString()+ "  "+dataSnapshot.child("message").getValue());
-
+                Toast.makeText(MainActivity.this, dataSnapshot.toString()+" should work",
+                        Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(getApplicationContext(),ChatActivity.class));
             }
 
             @Override
@@ -127,4 +137,38 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {
+        int action=event.getActionMasked();
+        switch (action){
+            case MotionEvent.ACTION_DOWN:
+                counter++;
+                if(!isRunning) {
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            checkForTaps(counter);
+                            counter = 0;
+                            Log.d("mytag", "reset");
+                            isRunning=false;
+                        }
+                    }, 700);
+                    isRunning=true;
+                }
+
+                break;
+        }
+        return super.onTouchEvent(event);
+    }
+
+    private void checkForTaps(int count){
+        Log.d("mytag",count+" counter");
+        if(count==3)
+            startScanner();
+        else if(count==2) {
+
+            TelephonyManager tMgr =(TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
+            generateQR(tMgr.getDeviceId());
+        }
+    }
 }

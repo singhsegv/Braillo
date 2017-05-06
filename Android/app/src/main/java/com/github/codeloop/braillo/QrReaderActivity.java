@@ -39,7 +39,7 @@ public class QrReaderActivity extends AppCompatActivity implements ZXingScannerV
     {   Intent returnIntent = new Intent();
         String id = rawResult.getText();
         setResult(Activity.RESULT_OK, returnIntent);
-        returnIntent.putExtra("phoneid", id);
+        returnIntent.putExtra("phonedata", id);
         finish();
     }
 

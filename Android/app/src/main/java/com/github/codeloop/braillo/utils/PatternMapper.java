@@ -1,5 +1,7 @@
 package com.github.codeloop.braillo.utils;
 
+import java.util.Arrays;
+
 /**
  * <p>
  * Created by Angad Singh on 6/5/17.
@@ -163,9 +165,61 @@ public class PatternMapper {
         {1,1}
     };
 
-    public static String compare(int[][] C) {
-
-        return new String();
+    public static String compare(int[][] x) {
+        if(Arrays.deepEquals(A,x))
+            return "a";
+        else if(Arrays.deepEquals(B,x))
+            return "b";
+        else if(Arrays.deepEquals(C,x))
+            return "c";
+        else if(Arrays.deepEquals(D,x))
+            return "d";
+        else if(Arrays.deepEquals(E,x))
+            return "e";
+        else if(Arrays.deepEquals(F,x))
+            return "f";
+        else if(Arrays.deepEquals(G,x))
+            return "g";
+        else if(Arrays.deepEquals(H,x))
+            return "h";
+        else if(Arrays.deepEquals(I,x))
+            return "i";
+        else if(Arrays.deepEquals(J,x))
+            return "j";
+        else if(Arrays.deepEquals(K,x))
+            return "k";
+        else if(Arrays.deepEquals(L,x))
+            return "l";
+        else if(Arrays.deepEquals(M,x))
+            return "m";
+        else if(Arrays.deepEquals(N,x))
+            return "n";
+        else if(Arrays.deepEquals(O,x))
+            return "o";
+        else if(Arrays.deepEquals(P,x))
+            return "p";
+        else if(Arrays.deepEquals(Q,x))
+            return "q";
+        else if(Arrays.deepEquals(R,x))
+            return "r";
+        else if(Arrays.deepEquals(S,x))
+            return "s";
+        else if(Arrays.deepEquals(T,x))
+            return "t";
+        else if(Arrays.deepEquals(U,x))
+            return "u";
+        else if(Arrays.deepEquals(V,x))
+            return "v";
+        else if(Arrays.deepEquals(W,x))
+            return "w";
+        else if(Arrays.deepEquals(X,x))
+            return "x";
+        else if(Arrays.deepEquals(Y,x))
+            return "y";
+        else if(Arrays.deepEquals(Z,x))
+            return "z";
+        else
+            return "";
     }
 
 }
