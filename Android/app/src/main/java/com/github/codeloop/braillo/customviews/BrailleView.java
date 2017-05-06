@@ -8,6 +8,7 @@ import android.graphics.RectF;
 import android.os.Build;
 import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.support.v4.view.MotionEventCompat;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -28,7 +29,7 @@ public class BrailleView extends View {
     private long counter;
     private Context context;
     private Paint paint;
-    private int matrix[][];
+    private int mapping[][];
     private int radius;
     private int maxTouch;
     private float centerX, centerY;
@@ -38,8 +39,8 @@ public class BrailleView extends View {
     private boolean running = false;
     private Handler handler;
 
-    private int clickCount = 0;
-    private static final int MAX_DURATION = 500;
+    private int clickCount = 0, moves = 0;
+    private static final int MAX_DURATION = 200;
 
     private GestureHandler gestureHandler;
 
@@ -57,7 +58,7 @@ public class BrailleView extends View {
         this.context = context;
         paint = new Paint();
         paint.setAntiAlias(true);
-        matrix = new int[3][2];
+        mapping = new int[3][2];
         bounds = new RectF[6];
         handler = new Handler();
         for (int i = 0; i < bounds.length; i++) {
@@ -84,30 +85,29 @@ public class BrailleView extends View {
 
         paint.setColor(Color.WHITE);
 
-        canvas.drawLine(width / 2, 0, width / 2, height, paint);
-
-        canvas.drawLine(0, height / 3, width, height / 3, paint);
-        canvas.drawLine(0, height - (height / 3), width, height - (height / 3), paint);
+//        canvas.drawLine(width / 2, 0, width / 2, height, paint);
+//
+//        canvas.drawLine(0, height / 3, width, height / 3, paint);
+//        canvas.drawLine(0, height - (height / 3), width, height - (height / 3), paint);
 
         paint.setColor(Color.YELLOW);
 
         //X Grids
-        canvas.drawLine(0, (height / 2) - (height / 3), width, (height /2) - (height / 3), paint);
-        canvas.drawLine(0, (height / 2), width, (height / 2), paint);
-        canvas.drawLine(0, (height / 2) + (height / 3), width, (height /2) + (height / 3), paint);
-
-        //Y Grids
-        canvas.drawLine(width / 4, 0, width / 4, height, paint);
-        canvas.drawLine((width / 2) + (width / 4), 0, (width / 2) + (width / 4), height, paint);
+//        canvas.drawLine(0, (height / 2) - (height / 3), width, (height /2) - (height / 3), paint);
+//        canvas.drawLine(0, (height / 2), width, (height / 2), paint);
+//        canvas.drawLine(0, (height / 2) + (height / 3), width, (height /2) + (height / 3), paint);
+//
+//        //Y Grids
+//        canvas.drawLine(width / 4, 0, width / 4, height, paint);
+//        canvas.drawLine((width / 2) + (width / 4), 0, (width / 2) + (width / 4), height, paint);
 
         for(int i = 0 ; i < 3 ; i++) {
             for(int j = 0; j < 2; j++) {
                 float x = (centerX * j) + (centerX / 2);
                 float y = ((2 * i) + 1) * (centerY / 3);
 
-//                Log.e("COORD", x + ":" + y + ":" + i + ":" + j);
-                if(matrix[i][j] == 0) {
-                    paint.setColor(Color.WHITE);
+                if(mapping[i][j] == 0) {
+                    paint.setColor(Color.parseColor("#324986"));
                 }
                 else {
                     paint.setColor(Color.WHITE);
@@ -119,30 +119,51 @@ public class BrailleView extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        float x = event.getX();
-        float y = event.getY();
+        int action = MotionEventCompat.getActionMasked(event);
+        int index = MotionEventCompat.getActionIndex(event);
+
+        final float x;
+        final float y;
 
         int points = event.getPointerCount();
-        switch (event.getActionMasked()) {
-            case MotionEvent.ACTION_UP: if(Math.max(Math.abs(delX),Math.abs(delY)) < 2) {
+        if (points > 1) {
+            x = MotionEventCompat.getX(event, index);
+            y = MotionEventCompat.getY(event, index);
+
+        } else {
+            x = MotionEventCompat.getX(event, index);
+            y = MotionEventCompat.getY(event, index);
+        }
+
+        switch (action) {
+            case MotionEvent.ACTION_UP: if(Math.max(Math.abs(delX),Math.abs(delY)) < minDim / 80) {
                                             long time = System.currentTimeMillis() - counter;
-                                            if(time < 250) {
+                                            if(time < MAX_DURATION && points < 2 && moves < 5) {
                                                 clickCount++;
                                                 if(!running) {
                                                     running = true;
                                                     handler.postDelayed(new Runnable() {
                                                         @Override
                                                         public void run() {
+                                                            if(clickCount == 1) {
+                                                                for(int i = 0; i < bounds.length; i++) {
+
+                                                                    if(bounds[i].contains(x, y)) {
+                                                                        int row = i / 2;
+                                                                        int col = i % 2;
+                                                                        if(mapping[row][col] != 1) {
+                                                                            Log.e("FOUND", "Found in "+(i+1)+" coordinate.["+row+","+col+"]");
+                                                                            mapping[row][col] = 1;
+                                                                            invalidate();
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
                                                             gestureHandler.onTouch(clickCount);
                                                             running = false;
                                                             clickCount = 0;
                                                         }
                                                     }, MAX_DURATION);
-                                                }
-                                                for(int i = 0; i < bounds.length; i++) {
-                                                    if(bounds[i].contains(x, y)) {
-                                                        Log.e("FOUND", "Found in "+(i+1)+" coordinate.");
-                                                    }
                                                 }
 
                                             }
@@ -168,6 +189,7 @@ public class BrailleView extends View {
                                             }
                                         }
 
+                                        moves = 0;
                                         counter = 0;
                                         maxTouch = 0;
                                         delX = 0; delY = 0;
@@ -178,8 +200,6 @@ public class BrailleView extends View {
                                             maxTouch = Math.max(maxTouch, points);
                                             moveX = x;
                                             moveY = y;
-
-                                            clickCount++;
                                             break;
 
             case MotionEvent.ACTION_MOVE:   delX = x - moveX;
@@ -187,6 +207,8 @@ public class BrailleView extends View {
                                             moveX = x;
                                             moveY = y;
                                             counter++;
+                                            moves++;
+//                                            Log.e("COUNT",moves+"");
                                             maxTouch = Math.max(maxTouch, points);
                                             break;
         }
@@ -213,5 +235,18 @@ public class BrailleView extends View {
 
     public void setGestureHandler(GestureHandler gestureHandler) {
         this.gestureHandler = gestureHandler;
+    }
+
+    public int[][] getMapping() {
+        return mapping;
+    }
+
+    public void clear() {
+        for(int i = 0 ; i < 3 ; i++) {
+            for (int j = 0;j < 2; j++) {
+                mapping[i][j] = 0;
+            }
+        }
+        invalidate();
     }
 }
