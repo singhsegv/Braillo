@@ -163,7 +163,7 @@ public class PatternMapper {
         {1,1}
     };
 
-    public static String getJSON(int[][] Ch) {
+    public static String compare(int[][] C) {
 
         return new String();
     }
