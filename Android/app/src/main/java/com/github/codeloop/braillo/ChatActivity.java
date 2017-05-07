@@ -42,6 +42,7 @@ public class ChatActivity extends Activity {
     FirebaseDatabase firebaseDatabase;
     ArrayList<Character> arrayList;
     PageAdapter pageAdapter;
+    ViewPager viewPager;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,7 +65,7 @@ public class ChatActivity extends Activity {
         final AppCompatEditText edt = (AppCompatEditText)findViewById(R.id.screen);
         final BrailleView keypad = (BrailleView)findViewById(R.id.keypad);
         ScrollBar scrollBar = (ScrollBar) findViewById(R.id.scrollBar);
-        ViewPager viewPager = (ViewPager) findViewById(R.id.readPager);
+        viewPager = (ViewPager) findViewById(R.id.readPager);
         arrayList = new ArrayList<>();
         pageAdapter = new PageAdapter(this, arrayList);
         viewPager.setAdapter(pageAdapter);
@@ -190,6 +191,7 @@ public class ChatActivity extends Activity {
                 for (char c : dataSnapshot.child("message").getValue().toString().toCharArray())
                     arrayList.add(c);
                 pageAdapter = new PageAdapter(ChatActivity.this, arrayList);
+                viewPager.setAdapter(pageAdapter);
             }
 
             @Override
