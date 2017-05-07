@@ -165,6 +165,11 @@ public class PatternMapper {
         {1,1}
     };
 
+    public static int SPACE[][] = {
+            {0,0},
+            {0,0},
+            {0,0}
+    };
     public static String compare(int[][] x) {
         if(Arrays.deepEquals(A,x))
             return "a";
@@ -218,6 +223,8 @@ public class PatternMapper {
             return "y";
         else if(Arrays.deepEquals(Z,x))
             return "z";
+        else if(Arrays.deepEquals(SPACE,x))
+            return " ";
         else
             return "";
     }

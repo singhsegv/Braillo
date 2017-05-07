@@ -2,16 +2,27 @@ package com.github.codeloop.braillo;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Vibrator;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.AppCompatEditText;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import com.github.codeloop.braillo.customviews.BrailleView;
+import com.github.codeloop.braillo.models.Chat;
 import com.github.codeloop.braillo.utils.GestureHandler;
 import com.github.codeloop.braillo.utils.PatternMapper;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 /**
  * <p>
@@ -21,11 +32,29 @@ import com.github.codeloop.braillo.utils.PatternMapper;
 
 public class ChatActivity extends Activity {
     private int matrix[][];
+    private String roomName;
+    String deviceId;
+
+    DatabaseReference reference;
+    FirebaseDatabase firebaseDatabase;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
+
+        if(getIntent().getStringExtra("room")!=null)
+            roomName = getIntent().getStringExtra("room");
+        else
+            roomName = " default";
+
+        PreferenceManager.getDefaultSharedPreferences(this).edit().putString("room",roomName).apply();
+        TelephonyManager tMgr =(TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
+        deviceId = tMgr.getDeviceId();
+        firebaseDatabase=FirebaseDatabase.getInstance();
+        reference=firebaseDatabase.getReference().child(roomName);
+        listenToClient();
+
         matrix = new int[3][2];
         final AppCompatEditText edt = (AppCompatEditText)findViewById(R.id.screen);
         final BrailleView keypad = (BrailleView)findViewById(R.id.keypad);
@@ -70,6 +99,8 @@ public class ChatActivity extends Activity {
             @Override
             public void onSwipeUp(int fingers) {
                 Log.e("GEST","Swipe Up:"+fingers);
+                reference.push().setValue(new Chat(edt.getText().toString(),deviceId,
+                        System.currentTimeMillis()));
             }
 
             @Override
@@ -87,4 +118,22 @@ public class ChatActivity extends Activity {
             }
         });
     }
+
+    private void listenToClient(){
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.child("user").
+                        getValue(String.class).compareTo(deviceId)!=0)
+                    Toast.makeText(ChatActivity.this,dataSnapshot
+                            .child("message").getValue()+"" , Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
 }

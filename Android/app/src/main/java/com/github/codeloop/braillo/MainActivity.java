@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -41,14 +42,23 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        linearLayout=(LinearLayout)findViewById(R.id.linearLayout);
-        linearLayout.setOnTouchListener(this);
-        counter=0;
-        isRunning=false;
-        handler=new Handler();
-        checkPermissions();
-        firebaseDatabase=FirebaseDatabase.getInstance();
 
+        if(PreferenceManager.getDefaultSharedPreferences(this).contains("room")){
+            Intent intent = new Intent(getApplicationContext(),ChatActivity.class);
+            intent.putExtra("room",
+                    PreferenceManager.getDefaultSharedPreferences(this).getString("room","default"));
+            startActivity(intent);
+            finish();
+        } else {
+
+            linearLayout = (LinearLayout) findViewById(R.id.linearLayout);
+            linearLayout.setOnTouchListener(this);
+            counter = 0;
+            isRunning = false;
+            handler = new Handler();
+            checkPermissions();
+            firebaseDatabase = FirebaseDatabase.getInstance();
+        }
 
 
     }
@@ -63,7 +73,9 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
             String roomName = phoneData.split(",")[1];
             reference=firebaseDatabase.getReference().child(roomName);
             reference.push().setValue("Ok");
-            startActivity(new Intent(getApplicationContext(),ChatActivity.class));
+            Intent intent = new Intent(getApplicationContext(),ChatActivity.class);
+            intent.putExtra("room",roomName);
+            startActivity(intent);
         }
 
     }
@@ -104,14 +116,16 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
     }
 
 
-    private void listenToClient(String roomName){
+    private void listenToClient(final String roomName){
         reference=firebaseDatabase.getReference().child(roomName);
         reference.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 Toast.makeText(MainActivity.this, dataSnapshot.toString()+" should work",
                         Toast.LENGTH_SHORT).show();
-                startActivity(new Intent(getApplicationContext(),ChatActivity.class));
+                Intent intent = new Intent(getApplicationContext(),ChatActivity.class);
+                intent.putExtra("room",roomName);
+                startActivity(intent);
             }
 
             @Override
