@@ -2,27 +2,29 @@ package com.github.codeloop.braillo;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.support.v4.view.ViewPager;
 import android.support.v7.widget.AppCompatEditText;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.github.codeloop.braillo.controllers.GestureListener;
+import com.github.codeloop.braillo.controllers.PageAdapter;
 import com.github.codeloop.braillo.customviews.BrailleView;
 import com.github.codeloop.braillo.models.Chat;
-import com.github.codeloop.braillo.utils.GestureHandler;
 import com.github.codeloop.braillo.utils.PatternMapper;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
 
 /**
  * <p>
@@ -58,7 +60,14 @@ public class ChatActivity extends Activity {
         matrix = new int[3][2];
         final AppCompatEditText edt = (AppCompatEditText)findViewById(R.id.screen);
         final BrailleView keypad = (BrailleView)findViewById(R.id.keypad);
-
+        ViewPager viewPager = (ViewPager) findViewById(R.id.readPager);
+        char arr[] = "Hello World".toLowerCase().toCharArray();
+        ArrayList<Character> arrayList = new ArrayList<>();
+        for(char ch : arr) {
+            arrayList.add(ch);
+        }
+        viewPager.setAdapter(new PageAdapter(this, arrayList));
+//        readerView.setMapping(PatternMapper.A);
         edt.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
@@ -66,7 +75,7 @@ public class ChatActivity extends Activity {
                 return true;
             }
         });
-        keypad.setGestureHandler(new GestureHandler() {
+        keypad.setGestureHandler(new GestureListener() {
             @Override
             public void onSwipeRight(int fingers) {
                 Log.e("GEST","Swipe Right:"+fingers);
@@ -74,6 +83,14 @@ public class ChatActivity extends Activity {
                 if(str.length() > 0) {
                     edt.setText(str.substring(0, str.length() - 1));
                 }
+                Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                v.vibrate(50);
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                v.vibrate(50);
                 keypad.clear();
             }
 
@@ -82,7 +99,6 @@ public class ChatActivity extends Activity {
                 Log.e("GEST","Swipe Left:"+fingers);
                 int[][] matrix = keypad.getMapping();
                 String resp = PatternMapper.compare(matrix);
-//                Toast.makeText(getBaseContext(), "Matches: "+PatternMapper.compare(matrix), Toast.LENGTH_SHORT).show();
                 StringBuffer buff = new StringBuffer(edt.getText().toString());
                 edt.setText(buff.append(resp));
                 Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
@@ -106,6 +122,15 @@ public class ChatActivity extends Activity {
             @Override
             public void onSwipeDown(int fingers) {
                 Log.e("GEST","Swipe Down:"+fingers);
+                Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                v.vibrate(50);
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                v.vibrate(50);
+                keypad.clear();
             }
 
             @Override
@@ -135,5 +160,4 @@ public class ChatActivity extends Activity {
             }
         });
     }
-
 }

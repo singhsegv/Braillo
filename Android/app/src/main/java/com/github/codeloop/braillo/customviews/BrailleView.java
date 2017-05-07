@@ -15,7 +15,7 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import com.github.codeloop.braillo.R;
-import com.github.codeloop.braillo.utils.GestureHandler;
+import com.github.codeloop.braillo.controllers.GestureListener;
 
 /**
  * <p>
@@ -42,7 +42,7 @@ public class BrailleView extends View {
     private int clickCount = 0, moves = 0;
     private static final int MAX_DURATION = 200;
 
-    private GestureHandler gestureHandler;
+    private GestureListener gestureHandler;
 
     public BrailleView(Context context) {
         super(context);
@@ -83,14 +83,14 @@ public class BrailleView extends View {
             canvas.drawColor(context.getResources().getColor(R.color.colorPrimary));
         }
 
-        paint.setColor(Color.WHITE);
+//        paint.setColor(Color.WHITE);
 
 //        canvas.drawLine(width / 2, 0, width / 2, height, paint);
 //
 //        canvas.drawLine(0, height / 3, width, height / 3, paint);
 //        canvas.drawLine(0, height - (height / 3), width, height - (height / 3), paint);
 
-        paint.setColor(Color.YELLOW);
+//        paint.setColor(Color.YELLOW);
 
         //X Grids
 //        canvas.drawLine(0, (height / 2) - (height / 3), width, (height /2) - (height / 3), paint);
@@ -233,7 +233,7 @@ public class BrailleView extends View {
         bounds[5].set(width / 2, (height / 2) + (height / 6), width, height);       //Sixth Coordinate
     }
 
-    public void setGestureHandler(GestureHandler gestureHandler) {
+    public void setGestureHandler(GestureListener gestureHandler) {
         this.gestureHandler = gestureHandler;
     }
 

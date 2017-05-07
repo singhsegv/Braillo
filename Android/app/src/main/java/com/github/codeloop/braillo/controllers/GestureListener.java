@@ -1,4 +1,4 @@
-package com.github.codeloop.braillo.utils;
+package com.github.codeloop.braillo.controllers;
 
 /**
  * <p>
@@ -6,7 +6,7 @@ package com.github.codeloop.braillo.utils;
  * </p>
  */
 
-public interface GestureHandler {
+public interface GestureListener {
     void onSwipeRight(int fingers);
     void onSwipeLeft(int fingers);
     void onSwipeUp(int fingers);
