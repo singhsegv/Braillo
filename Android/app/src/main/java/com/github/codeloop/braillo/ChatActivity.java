@@ -11,7 +11,6 @@ import android.support.v7.widget.AppCompatEditText;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.View;
-import android.widget.Toast;
 
 import com.github.codeloop.braillo.controllers.GestureListener;
 import com.github.codeloop.braillo.controllers.PageAdapter;
@@ -25,7 +24,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
@@ -70,7 +68,6 @@ public class ChatActivity extends Activity {
         arrayList = new ArrayList<>();
         pageAdapter = new PageAdapter(this, arrayList);
         viewPager.setAdapter(pageAdapter);
-//        readerView.setMapping(PatternMapper.A);
         edt.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
@@ -192,7 +189,7 @@ public class ChatActivity extends Activity {
                 arrayList.clear();
                 for (char c : dataSnapshot.child("message").getValue().toString().toCharArray())
                     arrayList.add(c);
-                pageAdapter.notifyDataSetChanged();
+                pageAdapter = new PageAdapter(ChatActivity.this, arrayList);
             }
 
             @Override

@@ -28,7 +28,6 @@ public class PageAdapter extends PagerAdapter {
 
     @Override
     public Object instantiateItem(ViewGroup collection, int position) {
-//        ModelObject modelObject = ModelObject.values()[position];
         ReaderView view = new ReaderView(context);
         view.setMapping(PatternMapper.getArray(stream.get(position).toString()));
         view.setClickable(true);
