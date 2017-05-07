@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
+import android.speech.tts.TextToSpeech;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.AppCompatEditText;
@@ -26,6 +27,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 /**
  * <p>
@@ -36,13 +38,14 @@ import java.util.ArrayList;
 public class ChatActivity extends Activity {
     private int matrix[][];
     private String roomName;
-    String deviceId;
+    private String deviceId;
+    private TextToSpeech t1;
+    private ViewPager viewPager;
 
     DatabaseReference reference;
     FirebaseDatabase firebaseDatabase;
     ArrayList<Character> arrayList;
     PageAdapter pageAdapter;
-    ViewPager viewPager;
     ArrayList<String> allData;
     int listPointer;
     @Override
@@ -76,6 +79,15 @@ public class ChatActivity extends Activity {
         arrayList = new ArrayList<>();
         pageAdapter = new PageAdapter(this, arrayList);
         viewPager.setAdapter(pageAdapter);
+        t1=new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                if(status != TextToSpeech.ERROR) {
+                    t1.setLanguage(Locale.US);
+                }
+            }
+        });
+
         edt.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
@@ -107,6 +119,7 @@ public class ChatActivity extends Activity {
                 Log.e("GEST","Swipe Left:"+fingers);
                 int[][] matrix = keypad.getMapping();
                 String resp = PatternMapper.compare(matrix);
+                t1.speak(resp, TextToSpeech.QUEUE_FLUSH, null);
                 StringBuffer buff = new StringBuffer(edt.getText().toString());
                 edt.setText(buff.append(resp));
                 Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
@@ -123,22 +136,27 @@ public class ChatActivity extends Activity {
             @Override
             public void onSwipeUp(int fingers) {
                 Log.e("GEST","Swipe Up:"+fingers);
-                reference.push().setValue(new Chat(edt.getText().toString(),deviceId,
-                        System.currentTimeMillis()));
-                Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-                v.vibrate(50);
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                String message = edt.getText().toString();
+                if(!message.equals("")) {
+                    reference.push().setValue(new Chat(message, deviceId,
+                            System.currentTimeMillis()));
+                    t1.speak("Message Sent", TextToSpeech.QUEUE_FLUSH, null);
+                    Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                    v.vibrate(50);
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    v.vibrate(50);
+                    edt.setText("");
                 }
-                v.vibrate(50);
-                edt.setText("");
             }
 
             @Override
             public void onSwipeDown(int fingers) {
                 Log.e("GEST","Swipe Down:"+fingers);
+                t1.speak("Pad Cleared", TextToSpeech.QUEUE_FLUSH, null);
                 Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
                 v.vibrate(50);
                 try {

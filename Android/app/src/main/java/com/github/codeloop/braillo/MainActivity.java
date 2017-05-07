@@ -1,6 +1,7 @@
 package com.github.codeloop.braillo;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -11,7 +12,6 @@ import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -28,16 +28,14 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import net.glxn.qrgen.android.QRCode;
 
-
-
-public class MainActivity extends AppCompatActivity implements View.OnTouchListener{
-
+public class MainActivity extends Activity implements View.OnTouchListener{
     int counter;
     LinearLayout linearLayout;
     Handler handler;
     boolean isRunning;
     DatabaseReference reference;
     FirebaseDatabase firebaseDatabase;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,8 +44,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
 
         if(PreferenceManager.getDefaultSharedPreferences(this).contains("room")){
             Intent intent = new Intent(getApplicationContext(),ChatActivity.class);
-            intent.putExtra("room",
-                    PreferenceManager.getDefaultSharedPreferences(this).getString("room","default"));
+            intent.putExtra("room", PreferenceManager.getDefaultSharedPreferences(this).getString("room","default"));
             startActivity(intent);
             finish();
         } else {
@@ -88,13 +85,11 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
     }
 
     private void checkPermissions(){
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
-
-
-        } else
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE,
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED &&
+            ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE,
                     Manifest.permission.CAMERA}, 10);
-
+        }
     }
 
     @Override
@@ -118,7 +113,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
 
 
     private void listenToClient(final String roomName){
-        reference=firebaseDatabase.getReference().child(roomName);
+        reference = firebaseDatabase.getReference().child(roomName);
         reference.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
