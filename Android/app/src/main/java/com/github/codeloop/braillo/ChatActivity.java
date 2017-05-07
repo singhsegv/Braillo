@@ -39,7 +39,8 @@ public class ChatActivity extends Activity {
 
     DatabaseReference reference;
     FirebaseDatabase firebaseDatabase;
-
+    ArrayList<Character> arrayList;
+    PageAdapter pageAdapter;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,6 +51,7 @@ public class ChatActivity extends Activity {
         else
             roomName = " default";
 
+        Log.d("mytag",roomName+" roomName");
         PreferenceManager.getDefaultSharedPreferences(this).edit().putString("room",roomName).apply();
         TelephonyManager tMgr =(TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
         deviceId = tMgr.getDeviceId();
@@ -61,12 +63,9 @@ public class ChatActivity extends Activity {
         final AppCompatEditText edt = (AppCompatEditText)findViewById(R.id.screen);
         final BrailleView keypad = (BrailleView)findViewById(R.id.keypad);
         ViewPager viewPager = (ViewPager) findViewById(R.id.readPager);
-        char arr[] = "Hello World".toLowerCase().toCharArray();
-        ArrayList<Character> arrayList = new ArrayList<>();
-        for(char ch : arr) {
-            arrayList.add(ch);
-        }
-        viewPager.setAdapter(new PageAdapter(this, arrayList));
+        arrayList = new ArrayList<>();
+        pageAdapter = new PageAdapter(this, arrayList);
+        viewPager.setAdapter(pageAdapter);
 //        readerView.setMapping(PatternMapper.A);
         edt.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
@@ -117,6 +116,8 @@ public class ChatActivity extends Activity {
                 Log.e("GEST","Swipe Up:"+fingers);
                 reference.push().setValue(new Chat(edt.getText().toString(),deviceId,
                         System.currentTimeMillis()));
+                edt.setText("");
+
             }
 
             @Override
@@ -148,10 +149,14 @@ public class ChatActivity extends Activity {
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if(dataSnapshot.child("user").
-                        getValue(String.class).compareTo(deviceId)!=0)
-                    Toast.makeText(ChatActivity.this,dataSnapshot
-                            .child("message").getValue()+"" , Toast.LENGTH_SHORT).show();
+                for(DataSnapshot dataSnap:dataSnapshot.getChildren()) {
+
+                    arrayList.clear();
+                    for (char c : dataSnap
+                            .child("message").getValue().toString().toCharArray())
+                        arrayList.add(c);
+                    pageAdapter.notifyDataSetChanged();
+                }
             }
 
             @Override

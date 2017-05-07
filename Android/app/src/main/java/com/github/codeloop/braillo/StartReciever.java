@@ -13,14 +13,16 @@ import android.util.Log;
 public class StartReciever extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        int counter=0;
-        if(PreferenceManager.getDefaultSharedPreferences(context).contains("counter"))
-            counter = PreferenceManager.getDefaultSharedPreferences(context).getInt("counter",0);
-        if(counter%2==0)
-            context.startActivity(new Intent(context,MainActivity.class));
-        else
-            PreferenceManager.getDefaultSharedPreferences(context).edit().putInt("counter",counter+1).apply();
 
-        Log.d("mytag",counter+" counter");
+        if(intent.getAction().equals(Intent.ACTION_USER_PRESENT)) {
+            int counter = 1;
+            if (PreferenceManager.getDefaultSharedPreferences(context).contains("counter"))
+                counter = PreferenceManager.getDefaultSharedPreferences(context).getInt("counter", 1);
+            if (counter % 2 == 0)
+                context.startActivity(new Intent(context, MainActivity.class));
+            else
+                PreferenceManager.getDefaultSharedPreferences(context).edit().putInt("counter", counter + 1).apply();
+            Log.d("mytag", counter + " counter");
+        }
     }
 }

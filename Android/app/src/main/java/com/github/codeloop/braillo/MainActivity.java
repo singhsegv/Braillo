@@ -42,6 +42,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        startService(new Intent(getApplicationContext(), StartService.class));
 
         if(PreferenceManager.getDefaultSharedPreferences(this).contains("room")){
             Intent intent = new Intent(getApplicationContext(),ChatActivity.class);
@@ -68,11 +69,12 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode==20){
             String phoneData = data.getStringExtra("phonedata");
+            TelephonyManager tMgr =(TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
 
             //send firebase request from qrcoder reader user
             String roomName = phoneData.split(",")[1];
             reference=firebaseDatabase.getReference().child(roomName);
-            reference.push().setValue("Ok");
+            reference.push().setValue(new Chat("OK",tMgr.getDeviceId(),System.currentTimeMillis()));
             Intent intent = new Intent(getApplicationContext(),ChatActivity.class);
             intent.putExtra("room",roomName);
             startActivity(intent);
@@ -121,9 +123,8 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         reference.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                Toast.makeText(MainActivity.this, dataSnapshot.toString()+" should work",
-                        Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(getApplicationContext(),ChatActivity.class);
+                Log.d("mytag",roomName);
                 intent.putExtra("room",roomName);
                 startActivity(intent);
             }
