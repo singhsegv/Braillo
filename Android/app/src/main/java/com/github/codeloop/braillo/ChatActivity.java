@@ -15,7 +15,9 @@ import android.widget.Toast;
 
 import com.github.codeloop.braillo.controllers.GestureListener;
 import com.github.codeloop.braillo.controllers.PageAdapter;
+import com.github.codeloop.braillo.controllers.ScrollListener;
 import com.github.codeloop.braillo.customviews.BrailleView;
+import com.github.codeloop.braillo.customviews.ScrollBar;
 import com.github.codeloop.braillo.models.Chat;
 import com.github.codeloop.braillo.utils.PatternMapper;
 import com.google.firebase.database.ChildEventListener;
@@ -63,6 +65,7 @@ public class ChatActivity extends Activity {
         matrix = new int[3][2];
         final AppCompatEditText edt = (AppCompatEditText)findViewById(R.id.screen);
         final BrailleView keypad = (BrailleView)findViewById(R.id.keypad);
+        ScrollBar scrollBar = (ScrollBar) findViewById(R.id.scrollBar);
         ViewPager viewPager = (ViewPager) findViewById(R.id.readPager);
         arrayList = new ArrayList<>();
         pageAdapter = new PageAdapter(this, arrayList);
@@ -117,8 +120,15 @@ public class ChatActivity extends Activity {
                 Log.e("GEST","Swipe Up:"+fingers);
                 reference.push().setValue(new Chat(edt.getText().toString(),deviceId,
                         System.currentTimeMillis()));
+                Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                v.vibrate(50);
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                v.vibrate(50);
                 edt.setText("");
-
             }
 
             @Override
@@ -144,6 +154,34 @@ public class ChatActivity extends Activity {
                 Log.e("GEST","Touched: "+counts);
             }
         });
+
+        scrollBar.setScrollListener(new ScrollListener() {
+            @Override
+            public void onScrollUp() {
+                Log.e("TAG","Scroll Up");
+                Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                v.vibrate(50);
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                v.vibrate(50);
+            }
+
+            @Override
+            public void onScrollDown() {
+                Log.e("TAG","Scroll Down");
+                Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                v.vibrate(50);
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                v.vibrate(50);
+            }
+        });
     }
 
     private void listenToClient(){
@@ -152,8 +190,7 @@ public class ChatActivity extends Activity {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 arrayList.clear();
-                for (char c : dataSnapshot
-                        .child("message").getValue().toString().toCharArray())
+                for (char c : dataSnapshot.child("message").getValue().toString().toCharArray())
                     arrayList.add(c);
                 pageAdapter.notifyDataSetChanged();
             }

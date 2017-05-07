@@ -259,8 +259,8 @@ public class PatternMapper {
             case "x":return X;
             case "y":return Y;
             case "z":return Z;
+            case " ":return SPACE;
         }
         return A;
     }
-
 }

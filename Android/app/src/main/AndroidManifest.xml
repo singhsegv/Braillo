@@ -22,7 +22,6 @@
         <activity android:name=".QrReaderActivity">
         </activity>
         <activity android:name=".ChatActivity">
-
         </activity>
 
         <service android:name=".StartService"/>
