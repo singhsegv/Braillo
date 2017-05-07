@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -121,6 +122,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         reference.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+
                 Intent intent = new Intent(getApplicationContext(),ChatActivity.class);
                 Log.d("mytag",roomName);
                 intent.putExtra("room",roomName);

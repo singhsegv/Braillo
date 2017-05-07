@@ -43,10 +43,17 @@ public class ChatActivity extends Activity {
     ArrayList<Character> arrayList;
     PageAdapter pageAdapter;
     ViewPager viewPager;
+    ArrayList<String> allData;
+    int listPointer;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
+
+        Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        v.vibrate(100);
+
+        allData =  new ArrayList<>();
 
         if(getIntent().getStringExtra("room")!=null)
             roomName = getIntent().getStringExtra("room");
@@ -165,6 +172,14 @@ public class ChatActivity extends Activity {
                     e.printStackTrace();
                 }
                 v.vibrate(50);
+
+                if((listPointer-1)>=0 && listPointer<=allData.size()-1) {
+                    Log.d("mytag", listPointer + " pointer up");
+                    listPointer--;
+                    Log.d("mytag", listPointer + " pointer up");
+                    updatePager(allData.get(listPointer));
+
+                }
             }
 
             @Override
@@ -178,6 +193,12 @@ public class ChatActivity extends Activity {
                     e.printStackTrace();
                 }
                 v.vibrate(50);
+                if(listPointer>=0&&(listPointer+1)<=allData.size()-1) {
+                    listPointer++;
+                    Log.d("mytag", listPointer + " pointer down");
+                    updatePager(allData.get(listPointer));
+                }
+
             }
         });
     }
@@ -187,11 +208,11 @@ public class ChatActivity extends Activity {
         reference.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                arrayList.clear();
-                for (char c : dataSnapshot.child("message").getValue().toString().toCharArray())
-                    arrayList.add(c);
-                pageAdapter = new PageAdapter(ChatActivity.this, arrayList);
-                viewPager.setAdapter(pageAdapter);
+                if(dataSnapshot.child("user").getValue().toString().compareTo(deviceId)!=0) {
+                    updatePager(dataSnapshot.child("message").getValue().toString());
+                    allData.add(dataSnapshot.child("message").getValue().toString());
+                    listPointer = allData.size()-1;
+                }
             }
 
             @Override
@@ -215,4 +236,17 @@ public class ChatActivity extends Activity {
             }
         });
     }
+
+    private void updatePager(String msg){
+        Log.d("mytag","msg "+msg);
+        arrayList.clear();
+        for (char c : msg.toCharArray())
+            arrayList.add(c);
+        pageAdapter = new PageAdapter(ChatActivity.this, arrayList);
+        viewPager.setAdapter(pageAdapter);
+        Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        v.vibrate(100);
+
+    }
+
 }
