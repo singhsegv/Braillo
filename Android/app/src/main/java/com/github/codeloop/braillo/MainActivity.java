@@ -30,7 +30,7 @@ import net.glxn.qrgen.android.QRCode;
 
 public class MainActivity extends Activity implements View.OnTouchListener{
     int counter;
-    LinearLayout linearLayout;
+    LinearLayout linearLayout,splashLayout,imgLayout;
     Handler handler;
     boolean isRunning;
     DatabaseReference reference;
@@ -50,6 +50,8 @@ public class MainActivity extends Activity implements View.OnTouchListener{
         } else {
 
             linearLayout = (LinearLayout) findViewById(R.id.linearLayout);
+            splashLayout = (LinearLayout) findViewById(R.id.splash);
+            imgLayout = (LinearLayout) findViewById(R.id.imgFrame);
             linearLayout.setOnTouchListener(this);
             counter = 0;
             isRunning = false;
@@ -64,14 +66,14 @@ public class MainActivity extends Activity implements View.OnTouchListener{
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode==20){
+        if(requestCode==20 && resultCode == RESULT_OK){
             String phoneData = data.getStringExtra("phonedata");
             TelephonyManager tMgr =(TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
 
             //send firebase request from qrcoder reader user
             String roomName = phoneData.split(",")[1];
             reference=firebaseDatabase.getReference().child(roomName);
-            reference.push().setValue(new Chat("OK",tMgr.getDeviceId(),System.currentTimeMillis()));
+            reference.push().setValue(new Chat("Hi",tMgr.getDeviceId(),System.currentTimeMillis()));
             Intent intent = new Intent(getApplicationContext(),ChatActivity.class);
             intent.putExtra("room",roomName);
             startActivity(intent);
@@ -105,7 +107,8 @@ public class MainActivity extends Activity implements View.OnTouchListener{
         String roomNameForQrGenerator = String.valueOf(System.currentTimeMillis());
         Bitmap myBitmap = QRCode.from(data+","+roomNameForQrGenerator).bitmap();
         ImageView myImage = (ImageView) findViewById(R.id.img);
-        myImage.setVisibility(View.VISIBLE);
+        imgLayout.setVisibility(View.VISIBLE);
+        splashLayout.setVisibility(View.GONE);
         myImage.setImageBitmap(myBitmap);
 
         listenToClient(roomNameForQrGenerator);
