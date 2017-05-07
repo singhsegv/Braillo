@@ -8,7 +8,6 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -48,7 +47,6 @@ public class MainActivity extends Activity implements View.OnTouchListener{
             startActivity(intent);
             finish();
         } else {
-
             linearLayout = (LinearLayout) findViewById(R.id.linearLayout);
             splashLayout = (LinearLayout) findViewById(R.id.splash);
             imgLayout = (LinearLayout) findViewById(R.id.imgFrame);

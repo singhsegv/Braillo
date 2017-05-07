@@ -58,11 +58,12 @@ public class ChatActivity extends Activity {
 
         allData =  new ArrayList<>();
 
-        if(getIntent().getStringExtra("room")!=null)
+        if(getIntent().getStringExtra("room")!=null) {
             roomName = getIntent().getStringExtra("room");
-        else
+        }
+        else {
             roomName = " default";
-
+        }
         Log.d("mytag",roomName+" roomName");
         PreferenceManager.getDefaultSharedPreferences(this).edit().putString("room",roomName).apply();
         TelephonyManager tMgr =(TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
@@ -79,6 +80,22 @@ public class ChatActivity extends Activity {
         arrayList = new ArrayList<>();
         pageAdapter = new PageAdapter(this, arrayList);
         viewPager.setAdapter(pageAdapter);
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                t1.speak(arrayList.get(position).toString(), TextToSpeech.QUEUE_FLUSH, null);
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
         t1=new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int status) {
@@ -91,7 +108,7 @@ public class ChatActivity extends Activity {
         edt.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                edt.setEnabled(true);
+                edt.setFocusable(true);
                 return true;
             }
         });
@@ -140,7 +157,7 @@ public class ChatActivity extends Activity {
                 if(!message.equals("")) {
                     reference.push().setValue(new Chat(message, deviceId,
                             System.currentTimeMillis()));
-                    t1.speak("Message Sent", TextToSpeech.QUEUE_FLUSH, null);
+                    t1.speak("Message Sent "+message, TextToSpeech.QUEUE_FLUSH, null);
                     Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
                     v.vibrate(50);
                     try {
@@ -195,6 +212,7 @@ public class ChatActivity extends Activity {
                     Log.d("mytag", listPointer + " pointer up");
                     listPointer--;
                     Log.d("mytag", listPointer + " pointer up");
+                    t1.speak("Next Message", TextToSpeech.QUEUE_FLUSH, null);
                     updatePager(allData.get(listPointer));
 
                 }
@@ -214,6 +232,7 @@ public class ChatActivity extends Activity {
                 if(listPointer>=0&&(listPointer+1)<=allData.size()-1) {
                     listPointer++;
                     Log.d("mytag", listPointer + " pointer down");
+                    t1.speak("Previous Message", TextToSpeech.QUEUE_FLUSH, null);
                     updatePager(allData.get(listPointer));
                 }
 
@@ -240,17 +259,14 @@ public class ChatActivity extends Activity {
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
-
             }
 
             @Override
             public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
             }
         });
     }
@@ -258,7 +274,7 @@ public class ChatActivity extends Activity {
     private void updatePager(String msg){
         Log.d("mytag","msg "+msg);
         arrayList.clear();
-        for (char c : msg.toCharArray())
+        for (char c : msg.toLowerCase().toCharArray())
             arrayList.add(c);
         pageAdapter = new PageAdapter(ChatActivity.this, arrayList);
         viewPager.setAdapter(pageAdapter);

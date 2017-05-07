@@ -36,13 +36,13 @@ public class PageAdapter extends PagerAdapter {
             public void onBoundIntercept(boolean state) {
                 if(state) {
                     Vibrator v = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
-                    v.vibrate(50);
+                    v.vibrate(100);
                     try {
-                        Thread.sleep(100);
+                        Thread.sleep(200);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    v.vibrate(50);
+                    v.vibrate(100);
                 }
                 else {
                     Vibrator v = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
