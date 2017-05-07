@@ -18,6 +18,7 @@ import com.github.codeloop.braillo.controllers.PageAdapter;
 import com.github.codeloop.braillo.customviews.BrailleView;
 import com.github.codeloop.braillo.models.Chat;
 import com.github.codeloop.braillo.utils.PatternMapper;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -146,17 +147,30 @@ public class ChatActivity extends Activity {
     }
 
     private void listenToClient(){
-        reference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for(DataSnapshot dataSnap:dataSnapshot.getChildren()) {
 
-                    arrayList.clear();
-                    for (char c : dataSnap
-                            .child("message").getValue().toString().toCharArray())
-                        arrayList.add(c);
-                    pageAdapter.notifyDataSetChanged();
-                }
+        reference.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                arrayList.clear();
+                for (char c : dataSnapshot
+                        .child("message").getValue().toString().toCharArray())
+                    arrayList.add(c);
+                pageAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
             }
 
             @Override
